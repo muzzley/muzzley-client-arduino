@@ -13,12 +13,20 @@ public:
 	void power(Client &client, char* server);
 	void statemachine(Client &client);
 	void connect(Client &client);
-	bool strhas(String str, String has);
     typedef void Action(Muzzleyclient &socket, char* socketString);
     void addAction(Action *socketAction);
   	int getParticipantID(char* rxdata);
   	int getCID(char* rxdata, int version);
-  	void parseJson();
+  	void parseObj(char* jsonString);
+  	int findpos(char* text, int index);
+
+  typedef struct {
+      int object;
+      int namecounter;
+      char name[2][10];
+      char value[2][10];
+  }  ActionObj;
+  ActionObj actionobj[2];
 
 
 private:
@@ -33,7 +41,6 @@ private:
 	char* getStringTableItem(int index, int send);
 	void changeServer(char* rxdata);
 	char* rpl(int strvar, int index, char* stradd);
-	int findpos(char* text, int index);
 	int getStrigTableItemSize(int index);
 	struct ActionPack {
     	Action *socketAction;

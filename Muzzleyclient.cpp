@@ -61,30 +61,36 @@ PROGMEM const char *MuzzleyClientStringTable[] =
   clientHandshakeLine21
 };
 
+boolean startRead = false;
 
-void parseJson() {
+// It will return for each object: Object d:XXX, Name: YYY, Value: ZZZ
+// TODO: remove the String & convert it to a char array to optimize memory
+void Muzzleyclient::parseObj(char* msgObj) {
+
+  String jsonString(msgObj);
   // Parsing according to the json.org structures
-  
   int c = 0; // Index counter while parsing
   int d = -1; // Dimension counter while parsing
   boolean registerValue = false;
   jsonString.trim();
-  
-  while( c < jsonString.length() ) {
-    // Loop
+
+  while( c < jsonString.length() ) {      // Loop until the end of the jSON string
+    int n = 0; // used as aux for the int version of value conversion
     if( jsonString.charAt(c) == '{' ) {
       c++; // Increase index counter by one
       d++; // Increase dimension by one
-      Serial.print( "Object d:" );
-      Serial.println( d );
+      //Serial.print( "Object d:" );
+      //Serial.println( d );
+      //action[d].object = d;
       
       if( registerValue ) { registerValue = false; }
     }
     else if( jsonString.charAt(c) == '[' ) {
       c++; // Increase index counter by one
       d++; // Increase dimension by one
-      Serial.print( "Array d:" );
-      Serial.println( d );
+      //Serial.print( "Array d:" );
+      //Serial.println( d );
+      //action[d].object = d;
       
       if( registerValue ) { registerValue = false; }
     }
@@ -101,34 +107,47 @@ void parseJson() {
       
       if( registerValue ) {
         registerValue = false;
-        Serial.print( "Value: " );
-        Serial.println( parsedString );
+        // djsb
+        //Serial.print( "Value: " );
+        //Serial.println( parsedString );
+        //parsedString.toCharArray(action[d].value, parsedString.length()); 
       }
       else {
-        Serial.print( "Name: " );
-        Serial.println( parsedString );
+        // djsb
+         //Serial.print( "Name: " );
+         //Serial.println( parsedString );
+        for (int i=0; i<parsedString.length(); i++){ 
+          actionobj[d].name[actionobj[d].namecounter][i] = parsedString[i];
+        }
+          actionobj[d].namecounter++;
+        //parsedString.toCharArray(actionobj[d].name, parsedString.length()); 
       }
     }
     else if( jsonString.charAt(c) > 47 && jsonString.charAt(c) < 58 ) {
-      Serial.print( "Number: " );
-      Serial.println( jsonString.charAt(c) );
+      // djsb
+      //Serial.print( "Number: " );
+      //Serial.println( jsonString.charAt(c) );
+      //action[d].value[n] = jsonString.charAt(c);
+      n++;
+
       
       if( registerValue ) { registerValue = false; }
+      c++;
     }
     else if( jsonString.indexOf( "true", c ) == c ) {
-      Serial.println( "Boolean TRUE" );
+      //Serial.println( "Boolean TRUE" );
       c = c + 4;
       
       if( registerValue ) { registerValue = false; }
     }
     else if( jsonString.indexOf( "false", c ) == c ) {
-      Serial.println( "Boolean FALSE" );
+      //Serial.println( "Boolean FALSE" );
       c = c + 5;
       
       if( registerValue ) { registerValue = false; }
     }
     else if( jsonString.indexOf( "null", c ) == c ) {
-      Serial.println( "NULL" );
+      //Serial.println( "NULL" );
       c = c + 4;
       
       if( registerValue ) { registerValue = false; }
@@ -151,8 +170,7 @@ void parseJson() {
       c++; // Increase index counter by one
     }
   }
-  
-  Serial.println( "Successfully parsed JSON data" );
+  // If reached this part, the json was successfully parsed
 }
 
 
