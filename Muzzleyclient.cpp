@@ -107,10 +107,10 @@ void Muzzleyclient::parseObj(char* msgObj) {
       
       if( registerValue ) {
         registerValue = false;
-        // djsb
-        //Serial.print( "Value: " );
-        //Serial.println( parsedString );
-        //parsedString.toCharArray(action[d].value, parsedString.length()); 
+        // Compose on the actions object the Value of the Key
+        for (int i=0; i<parsedString.length(); i++){ 
+          actionobj[d].value[actionobj[d].namecounter][i] = parsedString[i];
+        }
       }
       else {
         // djsb
@@ -446,7 +446,10 @@ void Muzzleyclient::changeServer(char* rxdata){
 
 void Muzzleyclient::statemachine(Client &client) {
 
-  Serial.print(F("fmem: "));Serial.println(freeMemory());
+  // Monitor what's happening in Memory inside the userspace.
+  // The user memory should not exceed 600 bytes :(
+  // Need to improve memory allocation
+  //Serial.print(F("fmem: "));Serial.println(freeMemory());
 
   socket_client = &client;
   boolean msgok=false;
@@ -464,13 +467,16 @@ void Muzzleyclient::statemachine(Client &client) {
     crxdata = websocket.getData();
 
     if (strlen(crxdata) > 0) {
+
+      // DEBUG what's coming from the pipe ;-)
+      /*
       Serial.print (F("RX: "));
       for (int i=0; i<strlen(crxdata); i++){
         Serial.print(crxdata[i]);
       }
 
       Serial.println(F(""));
-
+      */
 
 // *****************************************************
 // * START STATE MACHINE FOR INCOMING DATA
@@ -572,7 +578,7 @@ void Muzzleyclient::statemachine(Client &client) {
 
 
    // callback the userspace with a signal
-    if (findpos(crxdata, 21) != -1){
+    if ((findpos(crxdata, 21) != -1) && (findpos(crxdata, 11) == -1)){
       int startpos = findpos(crxdata, 21) + 1;
       int endpos = strlen(crxdata) - 1;
       char signal[endpos-startpos+1];

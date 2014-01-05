@@ -23,8 +23,8 @@ public:
   typedef struct {
       int object;
       int namecounter;
-      char name[2][10];
-      char value[2][10];
+      char name[2][22];
+      char value[2][22];
   }  ActionObj;
   ActionObj actionobj[2];
 
